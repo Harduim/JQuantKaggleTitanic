@@ -1,13 +1,10 @@
 import dtale
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.svm import SVC
 
 # constantes
 PATH_TRAIN_DATA = "train.csv"
@@ -15,15 +12,7 @@ PATH_TEST_DATA = "test.csv"
 RANDOM_SEED = 42
 NUM_STRATEGY = "mean"
 CAT_STRATEGY = "most_frequent"
-FEATURE_COLS = [
-    "Pclass",
-    "Sex",
-    "Age",
-    "SibSp",
-    "Parch",
-    "Cabin",
-    "Embarked"
-]
+FEATURE_COLS = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Cabin", "Embarked"]
 
 
 def preproc_data(data: pd.DataFrame) -> pd.DataFrame:
@@ -76,10 +65,15 @@ ohe = OneHotEncoder()
 cat_imputer = SimpleImputer(strategy=CAT_STRATEGY)
 num_imputer = SimpleImputer(strategy=NUM_STRATEGY)
 scaler = StandardScaler()
-gbc = GradientBoostingClassifier(random_state=RANDOM_SEED)
+mlp = MLPClassifier(random_state=RANDOM_SEED, solver="sgd", max_iter=5000)
 
 # pipe numeric
-num_feat = ["Age", "Pclass", "SibSp", "Parch", ]
+num_feat = [
+    "Age",
+    "Pclass",
+    "SibSp",
+    "Parch",
+]
 num_transf = Pipeline([("Num_Imputer", num_imputer), ("Scaler", scaler)])
 
 
@@ -93,11 +87,11 @@ preprocessor = ColumnTransformer(
 )
 
 
-pipe = Pipeline([("Preprocessor", preprocessor), ("Estimator", gbc)])
+pipe = Pipeline([("Preprocessor", preprocessor), ("Estimator", mlp)])
 pipe.fit(X_train, y_train)
 y_pred = pipe.predict(X_test)
 
 test_data["Survived"] = y_pred
-test_data.loc[:, ["PassengerId", "Survived"]].to_csv("submission_02.csv", index=False)
+test_data.loc[:, ["PassengerId", "Survived"]].to_csv("submission_03.csv", index=False)
 
 dtale.show(train_data)
