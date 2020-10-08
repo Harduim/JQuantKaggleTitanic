@@ -5,6 +5,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.svm import SVC
 
 # constantes
 PATH_TRAIN_DATA = "train.csv"
@@ -66,6 +67,8 @@ cat_imputer = SimpleImputer(strategy=CAT_STRATEGY)
 num_imputer = SimpleImputer(strategy=NUM_STRATEGY)
 scaler = StandardScaler()
 mlp = MLPClassifier(random_state=RANDOM_SEED, solver="sgd", max_iter=5000)
+svc = SVC(random_state=RANDOM_SEED)
+
 
 # pipe numeric
 num_feat = [
@@ -87,11 +90,11 @@ preprocessor = ColumnTransformer(
 )
 
 
-pipe = Pipeline([("Preprocessor", preprocessor), ("Estimator", mlp)])
+pipe = Pipeline([("Preprocessor", preprocessor), ("Estimator", svc)])
 pipe.fit(X_train, y_train)
 y_pred = pipe.predict(X_test)
 
 test_data["Survived"] = y_pred
-test_data.loc[:, ["PassengerId", "Survived"]].to_csv("submission_03.csv", index=False)
+test_data.loc[:, ["PassengerId", "Survived"]].to_csv("submission_04.csv", index=False)
 
 dtale.show(train_data)
