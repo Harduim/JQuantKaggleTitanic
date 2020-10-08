@@ -1,1 +1,3 @@
-data_vis.ipynb
+*__pycache__*
+*.pyc
+*.ipynb
